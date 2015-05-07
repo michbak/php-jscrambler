@@ -70,19 +70,24 @@ class Jscrambler {
 
         $curl = curl_init($url);
         if ($signed_data) {
-            if (!empty(CURLOPT_SAFE_UPLOAD)) {
-                curl_setopt($curl, CURLOPT_SAFE_UPLOAD, 0);
-            }
             curl_setopt($curl, CURLOPT_POST, 1);
             @curl_setopt($curl, CURLOPT_POSTFIELDS, $signed_data);
         }
-        if (defined('CURLOPT_PROTOCOLS'))
-            curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP);
+        if (defined('CURLOPT_PROTOCOLS')){
+            if ($this->api_port == 443)
+                curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
+            else
+                curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP);
+        }
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $request_method);
         curl_setopt($curl, CURLOPT_PORT, $this->api_port);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_TIMEOUT, 0);
-
+        if ($this->api_port == 443) {
+            curl_setopt($curl, CURLOPT_CAINFO, "curl-ca-bundle.pem");
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);            
+        }
 
         /* $transfer = array("transfer" => curl_exec($curl),
           "info" => curl_getinfo($curl)); */
