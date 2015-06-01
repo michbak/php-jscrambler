@@ -43,9 +43,21 @@ Your JScrambler's project configuration is achieved through a JSON file with the
     "secretKey": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   },
   "params": {
-    "rename_local": "%DEFAULT%",
-    "whitespace": "%DEFAULT%",
-    "literal_duplicates": "%DEFAULT%"
+    "dead_code": true,
+    "domain_lock": [
+      "*.jscrambler.com",
+      "localhost"
+    ],
+    "duplicate_literals": true,
+    "dot_notation_elimination": true,
+    "expiration_date": "2015-12-31",
+    "function_outlining": true,
+    "rename_local": true,
+    "string_splitting": {
+      "probability": 0.3,
+      "frequency": 0.4
+    },
+    "whitespace": true
   }
 }
 ```
@@ -85,10 +97,20 @@ JScramblerFacade::pollProject($client, PROJECT_ID);
 Uploads a project. The generated project id can be found in the response.
 ```php
 JScramblerFacade::uploadCode($client, array(
-  "files"               => array("index.js"),
-  "rename_local"        => "%DEFAULT%",
-  "whitespace"          => "%DEFAULT%",
-  "literal_duplicates"  => "%DEFAULT%"
+  "files" => array(
+    "index.js",
+    "lib/app.js"
+  ),
+  "domain_lock" => array(
+    "*.jscrambler.com",
+    "localhost"
+  ),
+  "rename_local" => true,
+  "string_splitting" => array(
+    "probability" => 0.3,
+    "frequency" => 0.4
+  ),
+  "whitespace" => true
 ));
 ```
 
