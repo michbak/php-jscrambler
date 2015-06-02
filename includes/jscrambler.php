@@ -152,7 +152,7 @@ class Jscrambler {
     private static function array_to_query($array) {
         $kv = array();
         foreach ($array as $key => $value) {
-            if(is_array($value)) {
+            if(is_array($value) || is_object($value)) {
                 $value = self::json_stringify($value);
             }
             $kv[] = self::urlencode($key) . '=' . self::urlencode($value);
