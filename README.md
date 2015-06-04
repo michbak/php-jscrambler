@@ -29,13 +29,19 @@ php-jscrambler
 Requirements
 ------------
 PHP 5.2.x or above (http://php.net/downloads.php)
+
 libcurl (http://pt.php.net/manual/en/curl.requirements.php)
+
+zip (https://pecl.php.net/package/zip)
 
 Configuration
 -------------
 Your JScrambler's project configuration is achieved through a JSON file with the following structure:
 ```json
 {
+  "host": "api.jscrambler.com",
+  "port": 443,
+  "apiVersion": 4,
   "filesSrc": ["index.js", "lib/**/*.js"],
   "filesDest": "dist/",
   "keys": {
@@ -173,3 +179,5 @@ If this is set to `true` then the project will be deleted from JScrambler after 
 Type: `Object`
 
 You can find a list of all the possible parameters in [here](https://github.com/auditmark/node-jscrambler#jscrambler-options).
+
+FAQ:
