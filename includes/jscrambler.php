@@ -72,11 +72,13 @@ class Jscrambler {
             $json_data = self::json_stringify($signed_data);
             $tmpfname = tempnam(sys_get_temp_dir(), 'php');
             file_put_contents($tmpfname, $json_data);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, 
-                    array("@$tmpfname;type=application/json"));
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-            if (defined(CURLOPT_SAFE_UPLOAD)) {
-                curl_setopt($curl, CURLOPT_SAFE_UPLOAD, 0);
+            if (version_compare(PHP_VERSION, '5.5.0') >= 0) {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, 
+                    array(new CurlFile($tmpfname, 'application/json', $tmpfname)));
+            } else {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, 
+                    array("@$tmpfname;type=application/json"));
             }
         }
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $request_method);
