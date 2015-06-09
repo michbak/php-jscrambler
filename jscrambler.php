@@ -31,6 +31,9 @@ class JScramblerFacade {
       $path .= ".zip";
     }
     $result = $client->get($path);
+    if (!empty($result->error)) {
+      throw new Exception($result->message);
+    }
     if (!self::$silent) {
       echo "Project downloaded\n";
     }
@@ -42,6 +45,9 @@ class JScramblerFacade {
     $result = json_decode($response);
     if (empty($result)) {
       throw new Exception('Failed to parse JSON.');
+    }
+    if (!empty($result->error)) {
+      throw new Exception($result->message);
     }
     return $result;
   }
@@ -55,6 +61,9 @@ class JScramblerFacade {
       $result = json_decode($response);
       if (empty($result)) {
         throw new Exception('Failed to parse JSON.');
+      }
+      if (!empty($result->error)) {
+        throw new Exception($result->message);
       }
       if ($result->error_id === "0") {
         break;
@@ -83,6 +92,9 @@ class JScramblerFacade {
     if (empty($result)) {
       throw new Exception('Failed to parse JSON.');
     }
+    if (!empty($result->error)) {
+      throw new Exception($result->message);
+    }
     if (!self::$silent) {
       echo "Project uploaded\n";
     }
@@ -97,6 +109,9 @@ class JScramblerFacade {
     $result = json_decode($response);
     if (empty($result)) {
       throw new Exception('Failed to parse JSON.');
+    }
+    if (!empty($result->error)) {
+      throw new Exception($result->message);
     }
     if (!self::$silent) {
       echo "Project deleted";
