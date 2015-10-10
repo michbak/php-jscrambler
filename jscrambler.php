@@ -15,7 +15,9 @@ class JScramblerFacade {
   // Time in seconds between each request while polling the server.
   const DELAY = 3;
   // Temporary zip file name.
-  const ZIP_TMP_FILE = '.tmp.zip';
+  const ZIP_TMP_FILE = 'jscrambler.tmp.zip';
+  // absolute path to temporary zip file
+  private static $absolutePathToTemporaryZipFile = null;
   // True if no console log output is intended.
   public static $silent = false;
   // Downloads a project. It returns the content of a Zip file.
@@ -85,7 +87,7 @@ class JScramblerFacade {
     }
     // Zip all the files before uploading
     self::zipProject($params['files']);
-    $params['files'] = array(self::ZIP_TMP_FILE);
+    $params['files'] = array(self::getTemporaryZipFilePath());
     // Upload
     $response = $client->post('/code.json', $params);
     $result = json_decode($response);
@@ -208,17 +210,18 @@ class JScramblerFacade {
   }
   // Cleans the temporary zip file.
   protected static function cleanZipFile () {
-    unlink(self::ZIP_TMP_FILE);
+    unlink(self::getTemporaryZipFilePath());
   }
   // Zips a project to a temporary file.
   protected static function zipProject ($files) {
     $hasFiles = false;
+    $temporaryZipFile = self::getTemporaryZipFilePath();
     if (count($files) === 1 && '.zip' === substr($files[0], -4, 4)) {
       $hasFiles = true;
-      copy($files[0], self::ZIP_TMP_FILE);
+      copy($files[0], $temporaryZipFile);
     } else {
       $zip = new ZipArchive();
-      $zip->open(self::ZIP_TMP_FILE, ZipArchive::CREATE);
+      $zip->open($temporaryZipFile, ZipArchive::CREATE);
       foreach ($files as $file) {
         if (!$hasFiles && is_file($file)) {
           $hasFiles = true;
@@ -235,11 +238,19 @@ class JScramblerFacade {
     }
   }
   // Unzips a project into the given destination.
-  protected static function unzipProject ($zipContent, $dest) {
+  public static function unzipProject ($zipContent, $dest) {
     $zip = new ZipArchive();
-    file_put_contents(self::ZIP_TMP_FILE, $zipContent);
-    $zip->open(self::ZIP_TMP_FILE);
+    $temporaryZipFilePath = self::getTemporaryZipFilePath();
+    file_put_contents($temporaryZipFilePath, $zipContent);
+    $zip->open($temporaryZipFilePath);
     $zip->extractTo($dest);
     self::cleanZipFile();
+  }
+  // returns a temporary zip file path using the OS defined temp dir
+  private static function getTemporaryZipFilePath(){
+    if(is_null(self::$absolutePathToTemporaryZipFile)){
+      self::$absolutePathToTemporaryZipFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . self::ZIP_TMP_FILE;
+    }
+    return self::$absolutePathToTemporaryZipFile;
   }
 }
