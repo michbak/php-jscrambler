@@ -70,7 +70,7 @@ class Jscrambler {
 
         $curl = curl_init($url);
         if ($signed_data) {
-            if (!empty(CURLOPT_SAFE_UPLOAD)) {
+            if (defined('CURLOPT_SAFE_UPLOAD')) {
                 curl_setopt($curl, CURLOPT_SAFE_UPLOAD, 0);
             }
             curl_setopt($curl, CURLOPT_POST, 1);
@@ -89,7 +89,7 @@ class Jscrambler {
         if ($this->api_port == 443) {
             curl_setopt($curl, CURLOPT_CAINFO, "curl-ca-bundle.pem");
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);            
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
         }
 
         /* $transfer = array("transfer" => curl_exec($curl),
