@@ -70,8 +70,10 @@ class Jscrambler {
 
         $curl = curl_init($url);
         if ($signed_data) {
-            if (defined('CURLOPT_SAFE_UPLOAD')) {
-                curl_setopt($curl, CURLOPT_SAFE_UPLOAD, 0);
+            foreach ($signed_data as $key => $value) {
+              if (preg_match("/^file_/", $key)) {
+                $signed_data["$key"] = curl_file_create($value);
+              }
             }
             curl_setopt($curl, CURLOPT_POST, 1);
             @curl_setopt($curl, CURLOPT_POSTFIELDS, $signed_data);
@@ -107,7 +109,7 @@ class Jscrambler {
         foreach ($js_files as $key => $file_path) {
             if (!is_string($file_path) || ($data = @file_get_contents($file_path)) === false)
                 throw new Exception("Unable to read file '{$file_path}'");
-            $contents["file_$key"] = "@$file_path"; // curl_setopt: To post a file, prepend a filename with @
+            $contents["file_$key"] = $file_path;
         }
         return $contents;
     }
@@ -139,9 +141,11 @@ class Jscrambler {
     }
 
     private function generate_hmac_signature($request_method, $resource_path, $params = array()) {
-        foreach ($params as $key => $value)
-            if (strpos($key, "file_") !== FALSE)
-                $params[$key] = md5_file(substr($params[$key], 1));
+        foreach ($params as $key => $value) {
+            if (strpos($key, "file_") !== FALSE) {
+                $params[$key] = md5_file($params[$key]);
+            }
+        }
         $hmac_signature_data = self::hmac_signature_data($request_method, $resource_path, $this->api_host, $params);
         $hashing_context = hash_init('sha256', HASH_HMAC, $this->secret_key);
         hash_update($hashing_context, $hmac_signature_data);
