@@ -232,6 +232,7 @@ class JScramblerFacade {
         }
         $zip->addFile($file);
       }
+      $zip->close();
     }
     if (!$hasFiles) {
       throw new Exception('No source files found. If you intend to send a whole directory sufix your path with "**" (e.g. ./my-directory/**)');
@@ -244,6 +245,7 @@ class JScramblerFacade {
     file_put_contents($temporaryZipFilePath, $zipContent);
     $zip->open($temporaryZipFilePath);
     $zip->extractTo($dest);
+    $zip->close();
     self::cleanZipFile();
   }
   // returns a temporary zip file path using the OS defined temp dir
